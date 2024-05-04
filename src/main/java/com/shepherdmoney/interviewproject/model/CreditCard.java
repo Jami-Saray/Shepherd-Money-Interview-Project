@@ -5,15 +5,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 
 @Entity
 @Getter
@@ -30,13 +26,14 @@ public class CreditCard {
 
     private String number;
 
+    private String cardNumber;
 
-
-
-
+//
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "user_id")
     private User owner;
 
-
+     @OneToMany
     private ArrayList<BalanceHistory> balanceHistory;
 
 
@@ -57,12 +54,15 @@ public class CreditCard {
         }
     
         // 如果给定日期之前没有记录，则从前一天开始填充
-        int startingBalance = (lastRecordBeforeUpdate != null) ? lastRecordBeforeUpdate.getBalance() : 0;
+        int startingBalance = (lastRecordBeforeUpdate != null) ? (int)lastRecordBeforeUpdate.getBalance() : 0;
         LocalDate startDate = (lastRecordBeforeUpdate != null) ? lastRecordBeforeUpdate.getDate().plusDays(1) : updateDate;
     
         // 填充从最后记录日期到更新日期的记录
         for (LocalDate date = startDate; date.isBefore(updateDate); date = date.plusDays(1)) {
-            balanceHistory.add(new BalanceHistory(date, startingBalance));
+            BalanceHistory newone = new BalanceHistory();
+            newone.setBalance(startingBalance);
+            newone.setDate(date);
+            balanceHistory.add(newone);
         }
     
         // 现在处理更新日期的记录

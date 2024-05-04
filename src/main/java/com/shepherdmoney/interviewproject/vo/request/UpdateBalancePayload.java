@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class UpdateBalancePayload {
 
-    private String creditCardNumber;
+    private String cardNumber;
     
     private LocalDate balanceDate;
 

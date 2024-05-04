@@ -18,15 +18,17 @@ public class UserController {
     // TODO: wire in the user repository (~ 1 line)
     @Autowired
     private UserRepository userRepository;
+
     @PutMapping("/user")
     public ResponseEntity<Integer> createUser(@RequestBody CreateUserPayload payload) {
         // TODO: Create an user entity with information given in the payload, store it in the database
         //       and return the id of the user in 200 OK response
-        int id = userRepository.length();
+
         User user = new User();
         user.setName(payload.getName());
-        user.setAge(payload.getAge());
+        user.setEmail(payload.getEmail());
         userRepository.save(user);
+        int id = user.getId();
         return ResponseEntity.ok(id);
     }   
 
@@ -40,5 +42,7 @@ public class UserController {
             return ResponseEntity.status(400).body("User not found");
         }
         userRepository.deleteById(userId);
+
+        return ResponseEntity.ok("ok");
     }
 }

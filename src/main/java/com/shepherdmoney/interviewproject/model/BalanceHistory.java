@@ -25,5 +25,5 @@ public class BalanceHistory {
     private LocalDate date;
 
     private double balance;
-    
+
 }

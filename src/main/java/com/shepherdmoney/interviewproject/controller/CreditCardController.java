@@ -32,6 +32,8 @@ public class CreditCardController {
     @Autowired
     private CreditCardRepository creditCardRepository;
 
+    @Autowired
+    private UserRepository userRepository;
     /**
      *
      * @param payload
@@ -44,16 +46,15 @@ public class CreditCardController {
         //       Return other appropriate response code for other exception cases
         //       Do not worry about validating the card number, assume card number could be any arbitrary format and length
         try {
-            Optional<User> userOptional = userRepository.findById(payload.getUserId());
-            if (userOptional.isEmpty()) {
+            User user= userRepository.findById(payload.getUserId());
+            if (user==null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
     
             CreditCard creditCard = new CreditCard();
             creditCard.setNumber(payload.getCardNumber());
             creditCard.setIssuanceBank(payload.getCardIssuanceBank());
-            // creditCard.addBalanceHistory(int(0))
-            creditCard.setOwner(userOptional.get());  // 设置信用卡的所有者
+            creditCard.setOwner(user);  // 设置信用卡的所有者
             creditCardRepository.save(creditCard);
     
             // 返回成功响应，包含信用卡ID
@@ -71,8 +72,8 @@ public class CreditCardController {
         //       if the user has no credit card, return empty list, never return null
         // return null;
         try {
-            Optional<User> userOptional = userRepository.findById(userId);
-            if (userOptional.isEmpty()) {
+            User  user= userRepository.findById(userId);
+            if (user==null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
     
@@ -123,16 +124,16 @@ public class CreditCardController {
         if (card == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        for (int i = 0; i < payload.length; i++) {
-            if (!payload[i].getCardNumber().equals(card.getNumber())) {
+        for (UpdateBalancePayload updateBalancePayload : payload) {
+            if (!updateBalancePayload.getCardNumber().equals(card.getNumber())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
             }
-            card.updateBalance(payload[i].getBalanceDate(), payload[i].getBalanceAmount());
+            card.updateBalance(updateBalancePayload.getBalanceDate(), (int) updateBalancePayload.getBalanceAmount());
         }
         
 
 
-        // return null;
+        return null;
     }
     
 }
